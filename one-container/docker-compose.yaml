@@ -30,6 +30,7 @@ services:
       REV_SERVER_CIDR: ${REV_SERVER_CIDR}
       PIHOLE_DNS_: 127.0.0.1#5335 # Hardcoded to our Unbound server
       DNSSEC: "true" # Enable DNSSEC
+      DNSMASQ_LISTENING: single
 #      DNS1: ${DNS1}
     volumes:
       - pihole:/etc/pihole:rw
@@ -37,4 +38,3 @@ services:
       - unbound:/etc/unbound:rw
       - ./resolv.conf:/etc/resolv.conf
     restart: unless-stopped
-
