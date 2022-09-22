@@ -1,35 +1,40 @@
-version: '3.0'
+version: '3.7'
 
 volumes:
-  etc_pihole-unbound:
-  etc_pihole_dnsmasq-unbound:
+  pihole:
+  dnsmasq:
+  unbound:
+#  resolv.conf:
 
 services:
   pihole:
-    container_name: pihole
-    image: cbcrowe/pihole-unbound:latest
+    container_name: pihole-unbound
+    image: pluim003/pihole-unbound:latest
     hostname: ${HOSTNAME}
     domainname: ${DOMAIN_NAME}
     ports:
-      - 443:443/tcp
+      - ${WEB_PORT}:${WEB_PORT}/tcp
       - 53:53/tcp
       - 53:53/udp
-      - ${PIHOLE_WEBPORT:-80}:80/tcp #Allows use of different port to access pihole web interface when other docker containers use port 80
+      # - 80:80/tcp
       # - 5335:5335/tcp # Uncomment to enable unbound access on local server
       # - 22/tcp # Uncomment to enable SSH
     environment:
-      - FTLCONF_LOCAL_IPV4=${FTLCONF_LOCAL_IPV4}
-      - TZ=${TZ:-UTC}
-      - WEBPASSWORD=${WEBPASSWORD}
-      - WEBTHEME=${WEBTHEME:-default-light}
-      - REV_SERVER=${REV_SERVER:-false}
-      - REV_SERVER_TARGET=${REV_SERVER_TARGET}
-      - REV_SERVER_DOMAIN=${REV_SERVER_DOMAIN}
-      - REV_SERVER_CIDR=${REV_SERVER_CIDR}
-      - PIHOLE_DNS_=127.0.0.1#5335
-      - DNSSEC="true"
-      - DNSMASQ_LISTENING=single
+      FTLCONF_REPLY_ADDR4: ${ServerIP}
+      TZ: ${TZ}
+      WEBPASSWORD: ${WEBPASSWORD}
+      WEB_PORT: ${WEB_PORT}
+      REV_SERVER: ${REV_SERVER}
+      REV_SERVER_TARGET: ${REV_SERVER_TARGET}
+      REV_SERVER_DOMAIN: ${REV_SERVER_DOMAIN}
+      REV_SERVER_CIDR: ${REV_SERVER_CIDR}
+      PIHOLE_DNS_: 127.0.0.1#5335 # Hardcoded to our Unbound server
+      DNSSEC: "true" # Enable DNSSEC
+#      DNS1: ${DNS1}
     volumes:
-      - etc_pihole-unbound:/etc/pihole:rw
-      - etc_pihole_dnsmasq-unbound:/etc/dnsmasq.d:rw
+      - pihole:/etc/pihole:rw
+      - dnsmasq:/etc/dnsmasq.d:rw
+      - unbound:/etc/unbound:rw
+      - ./resolv.conf:/etc/resolv.conf
     restart: unless-stopped
+
