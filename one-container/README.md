@@ -4,7 +4,7 @@
 
 This Docker deployment runs both Pi-Hole and Unbound in a single container.
 
-The base image for the container is the [official Pi-Hole container](https://hub.docker.com/r/pihole/pihole), with an extra build step added to install the Unbound resolver directly into to the container based on [instructions provided directly by the Pi-Hole team](https://docs.pi-hole.net/guides/unbound/).
+The base image for the container is the [official Pi-Hole container](https://hub.docker.com/r/pihole/pihole), with an extra build step added to install the Unbound resolver directly into to the container not using [instructions provided directly by the Pi-Hole team](https://docs.pi-hole.net/guides/unbound/) but by installing the latest available version of Unbound. It seems that using a package manager you will get an Unbound-version which is over 1 year old and might contain security-issues which have been solved in more recent versions.
 
 ## Usage
 
