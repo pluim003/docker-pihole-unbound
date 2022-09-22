@@ -15,6 +15,7 @@ RUN wget https://nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.g
     && tar -xf unbound-${UNBOUND_VERSION}.tar.gz -C / && rm unbound-${UNBOUND_VERSION}.tar.gz
 
 RUN cd unbound-${UNBOUND_VERSION} && ./configure && make && make install
+RUN cd / && rm -rf unbound-${UNBOUND_VERSION}
 
 COPY lighttpd-external.conf /etc/lighttpd/external.conf 
 COPY unbound-pihole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
