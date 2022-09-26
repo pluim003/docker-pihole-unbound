@@ -22,6 +22,10 @@ COPY unbound-pihole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
 COPY 99-edns.conf /etc/dnsmasq.d/99-edns.conf
 RUN mkdir -p /etc/services.d/unbound
 COPY unbound-run /etc/services.d/unbound/run
+RUN chmod ug+x /etc/services.d/unbound/run
+
+RUN wget https://www.internic.net/domain/named.root -qO- | sudo tee /var/lib/unbound/root.hints
+RUN chown -R unbound:unbound /var/lib/unbound/root.hints
 
 ENTRYPOINT ./s6-init
 
