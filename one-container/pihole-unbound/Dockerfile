@@ -24,7 +24,8 @@ RUN mkdir -p /etc/services.d/unbound
 COPY unbound-run /etc/services.d/unbound/run
 RUN chmod ug+x /etc/services.d/unbound/run
 
-RUN wget https://www.internic.net/domain/named.root -qO- | sudo tee /var/lib/unbound/root.hints
+RUN useradd unbound && mkdir /var/lib/unbound
+RUN wget https://www.internic.net/domain/named.root -qO- | tee /var/lib/unbound/root.hints
 RUN chown -R unbound:unbound /var/lib/unbound/root.hints
 
 ENTRYPOINT ./s6-init
