@@ -1,0 +1,120 @@
+#!/bin/sh -e
+
+UNBOUND_CONF="/etc/unbound/unbound.conf"
+UNBOUND_BASE_DIR="$(dirname $UNBOUND_CONF)"
+CHROOT_DIR="$(unbound-checkconf -o chroot)"
+
+DNS_ROOT_KEY_FILE="/usr/share/dns/root.key"
+ROOT_TRUST_ANCHOR_FILE="/var/lib/unbound/root.key"
+
+# Override these variables by editing or creating /etc/default/unbound.
+RESOLVCONF="true"
+ROOT_TRUST_ANCHOR_UPDATE="true"
+
+if [ -f /etc/default/unbound ]; then
+    . /etc/default/unbound
+
+    case "x$RESOLVCONF" in xfalse|x0|xno)
+        RESOLVCONF="false"
+        ;;
+    esac
+
+    case "x$ROOT_TRUST_ANCHOR_UPDATE" in xfalse|x0|xno)
+        ROOT_TRUST_ANCHOR_UPDATE="false"
+        ;;
+    esac
+fi
+
+do_resolvconf_start() {
+    if $RESOLVCONF; then
+        if [ -x /sbin/resolvconf ]; then
+            unbound-checkconf $CHROOT_DIR/$UNBOUND_CONF -o interface | (
+                default=yes
+                while read interface; do
+                    default=no
+                    if [ "x$interface" = x0.0.0.0 -o "x$interface" = x127.0.0.1 ]; then
+                        echo "nameserver 127.0.0.1"
+                    elif [ "x$interface" = x::0 -o "x$interface" = x::1 ]; then
+                        echo "nameserver ::1"
+                    fi
+                done
+                if [ $default = yes ]; then
+                    # unbound defaults to listening on localhost
+                    echo "nameserver 127.0.0.1"
+                fi
+            ) | /sbin/resolvconf -a lo.unbound
+        fi
+    fi
+}
+
+do_resolvconf_stop() {
+    if $RESOLVCONF; then
+        if [ -x /sbin/resolvconf ]; then
+            /sbin/resolvconf -d lo.unbound
+        fi
+    fi
+}
+
+do_chroot_setup() {
+    if [ -d "$CHROOT_DIR" -a "$CHROOT_DIR" != "$UNBOUND_BASE_DIR" ]; then
+        rm -rf $CHROOT_DIR/$UNBOUND_BASE_DIR && mkdir -p $CHROOT_DIR/$UNBOUND_BASE_DIR
+        cd /
+        tar -cf - $(echo $UNBOUND_BASE_DIR | sed 's/^\///') | (cd $CHROOT_DIR && tar -xf -)
+        if [ -S "/run/systemd/notify" ]; then
+            mkdir -p "$CHROOT_DIR/run/systemd"
+            touch "$CHROOT_DIR/run/systemd/notify"
+            mount --bind "/run/systemd/notify" "$CHROOT_DIR/run/systemd/notify"
+        fi
+    fi
+}
+
+do_chroot_teardown() {
+    if [ -d "$CHROOT_DIR" ] && mountpoint -q "$CHROOT_DIR/run/systemd/notify"; then
+        umount "$CHROOT_DIR/run/systemd/notify"
+    fi
+}
+
+do_root_trust_anchor_update() {
+    if $ROOT_TRUST_ANCHOR_UPDATE; then
+        if [ -n "$ROOT_TRUST_ANCHOR_FILE" ]; then
+            if [ -r "$DNS_ROOT_KEY_FILE" ]; then
+                if [ ! -e "$ROOT_TRUST_ANCHOR_FILE" -o "$DNS_ROOT_KEY_FILE" -nt "$ROOT_TRUST_ANCHOR_FILE" ]; then
+                    if [ ! -e "$ROOT_TRUST_ANCHOR_FILE" ]; then
+                        echo "$ROOT_TRUST_ANCHOR_FILE does not exist, copying from $DNS_ROOT_KEY_FILE"
+                    elif [ "$DNS_ROOT_KEY_FILE" -nt "$ROOT_TRUST_ANCHOR_FILE" ]; then
+                        echo "Overwriting older file $ROOT_TRUST_ANCHOR_FILE with newer file $DNS_ROOT_KEY_FILE"
+                    fi
+                    install -m 0644 -o unbound -g unbound "$DNS_ROOT_KEY_FILE" "$ROOT_TRUST_ANCHOR_FILE"
+                fi
+            fi
+        fi
+    fi
+}
+
+case "$1" in
+    resolvconf_start)
+        do_resolvconf_start
+        ;;
+
+    resolvconf_stop)
+        do_resolvconf_stop
+        ;;
+
+    chroot_setup)
+        do_chroot_teardown
+        do_chroot_setup
+        ;;
+
+    chroot_teardown)
+        do_chroot_teardown
+        ;;
+
+    root_trust_anchor_update)
+        do_root_trust_anchor_update
+        ;;
+
+    *)
+        echo "Usage: $0 {resolvconf_start|resolvconf_stop|chroot_setup|chroot_teardown|root_trust_anchor_update}" >&2
+        exit 1
+        ;;
+esac
