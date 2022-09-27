@@ -3,7 +3,7 @@ FROM pihole/pihole:nightly
 
 COPY sources.list /etc/apt/sources.list
 
-RUN apt update && apt-get upgrade -y && apt install -y -f unbound* && apt install -y -f wget
+RUN apt update && apt install -y -f unbound* && apt install -y -f wget
 
 RUN mkdir -p /var/log/unbound
 RUN chown -R unbound:unbound /var/log/unbound
