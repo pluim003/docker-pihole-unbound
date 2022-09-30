@@ -18,6 +18,7 @@ First create a `.env` file to substitute variables for your deployment.
 | -------- | ------- | ----- | ---------- |
 | `TZ` | UTC | `<Timezone>` | Set your [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) to make sure logs rotate at local midnight instead of at UTC midnight.
 | `WEBPASSWORD` | random | `<Admin password>` | http://pi.hole/admin password. Run `docker logs pihole \| grep random` to find your random pass.
+| `WEB_PORT` | unset | `<PORT>`| **This will break the 'webpage blocked' functionality of Pi-hole** however it may help advanced setups like those running synology or `--net=host` docker argument.  This guide explains how to restore webpage blocked functionality using a linux router DNAT rule: [Alternative Synology installation method](https://discourse.pi-hole.net/t/alternative-synology-installation-method/5454?u=diginc)
 | `FTLCONF_LOCAL_IPV4` | unset | `<Host's IP>` | Set to your server's LAN IP, used by web block modes and lighttpd bind address.
 | `REV_SERVER` | `false` | `<"true"\|"false">` | Enable DNS conditional forwarding for device name resolution |
 | `REV_SERVER_DOMAIN` | unset | Network Domain | If conditional forwarding is enabled, set the domain of the local network router |
@@ -31,17 +32,20 @@ Example `.env` file in the same directory as your `docker-compose.yaml` file:
 FTLCONF_LOCAL_IPV4=192.168.1.10
 TZ=America/Los_Angeles
 WEBPASSWORD=QWERTY123456asdfASDF
+WEB_PORT=8100
+FTLCONF_LOCAL_IPV4=192.168.1.35
 REV_SERVER=true
 REV_SERVER_DOMAIN=local
 REV_SERVER_TARGET=192.168.1.1
 REV_SERVER_CIDR=192.168.0.0/16
 HOSTNAME=pihole
 DOMAIN_NAME=pihole.local
-PIHOLE_WEBPORT=80
 WEBTHEME=default-light
 ```
 
-### Using Portainer stacks?
+### Using Portainer stacks? 
+
+#### Note: the text belows was written by Chris Crowe. I have no experience with this. I only use the docker-compose up-method
 
 > 2022-3-11: I'm being told that the advice below is no longer true in Portainer. If you're using Portainer, first try it without removing the volumes declaration and see if it works.
 
