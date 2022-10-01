@@ -1,9 +1,9 @@
-version: '3.7'
+version: '3.0'
 
 volumes:
-  pihole:
-  dnsmasq:
-  unbound:
+  etc_pihole:
+  etc_dnsmasq:
+  etc_unbound:
 #  resolv.conf:
 
 services:
@@ -33,8 +33,8 @@ services:
       DNSMASQ_LISTENING: single
 #      DNS1: ${DNS1}
     volumes:
-      - pihole:/etc/pihole:rw
-      - dnsmasq:/etc/dnsmasq.d:rw
-      - unbound:/etc/unbound:rw
+      - etc_pihole:/etc/pihole:rw
+      - etc_dnsmasq:/etc/dnsmasq.d:rw
+      - etc_unbound:/etc/unbound:rw
       - ./resolv.conf:/etc/resolv.conf
     restart: unless-stopped
