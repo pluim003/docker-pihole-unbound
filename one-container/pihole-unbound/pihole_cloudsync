@@ -1,0 +1,231 @@
+#!/bin/bash
+
+###########################################################################
+# pihole-cloudsync
+# Helper script to keep multiple Pi-holes' lists synchronized via Git
+
+# Steve Jenkins (stevejenkins.com)
+# https://github.com/stevejenkins/pihole-cloudsync
+
+version='5.0'
+update='December 26, 2020'
+
+# SETUP
+# Follow the instructions in the README to set up your own private Git
+# repository BEFORE running this script for the first time. This script
+# will not work without a properly configured Git repo and credentials.
+
+# USAGE: pihole-cloudsync <option>
+
+# OPTIONS:
+#  --initpush				Initialize Primary Pi-hole in "Push" mode
+#  --initpull				Initialize Secondary Pi-hole in "Pull" mode
+#  --push, --upload, --up, -u		Push (upload) your Pi-hole lists to a remote Git repo
+#  --pull, --download, --down, -d	Pull (download) your lists from a remote Git repo
+#  --help, -h, -?			Show the current version of pihole-cloudsync
+#  --version, -v			Show version number
+
+# EXAMPLES:
+#  'pihole-cloudsync --push' will push (upload) your lists to a remote Git repo
+#  'pihole-cloudsync --pull' will pull (download) your lists from a remote Git repo
+
+# Project Home: https://github.com/stevejenkins/pihole-cloudsync
+###########################################################################
+# CONSTANTS
+personal_git_dir='/usr/local/bin/my-pihole-lists'
+pihole_dir='/etc/pihole'
+gravity_db='/etc/pihole/gravity.db'
+dnsmasq_dir='/etc/dnsmasq.d/'
+ad_list='adlist.csv'
+custom_list='custom.list'
+domain_list='domainlist.csv'
+cname_list='05-pihole-custom-cname.conf'
+###########################################################################
+# SHOULDN'T NEED TO EDIT BELOW THIS LINE
+
+# Force sudo if not running with root privileges
+SUDO=''
+if [ "$EUID" -ne 0 ]
+  then SUDO='sudo'
+fi
+
+# FUNCTIONS
+push_initialize () {
+	# Go to Pi-hole directory, exit if doesn't exist
+	cd $pihole_dir || exit
+
+	# Verify Custom and CNAME lists exist
+	$SUDO touch $custom_list
+	$SUDO touch $dnsmasq_dir/$cname_list
+
+	# Copy local Custom and CNAME lists to local Git repo
+	$SUDO cp $custom_list $personal_git_dir
+	$SUDO cp $dnsmasq_dir/$cname_list $personal_git_dir
+
+	# Go to local Git repo directory
+	cd $personal_git_dir || exit
+
+	# Export Ad and Domain lists from Gravity database
+	$SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM adlist" >$ad_list
+	$SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM domainlist" >$domain_list
+
+	# Add all lists to local Git repo
+	$SUDO git add .
+	echo "Local Pi-hole initialized in Push mode and local lists were added to local Git repo. Run 'pihole-cloudsync --push' to push to remote Git repo.";
+}
+pull_initialize () {
+	# Go to Pi-hole directory, exit if doesn't exist
+	cd $personal_git_dir || exit
+
+	# Update local Git repo from remote Git repo
+	$SUDO git remote update > /dev/null
+
+	# Remove -q option if you don't want to run in "quiet" mode
+	$SUDO git fetch --all -q
+	$SUDO git reset --hard origin/master -q
+
+	# Stop DNS server
+	$SUDO service pihole-FTL stop
+
+	# Overwrite local files
+	$SUDO cp $custom_list $pihole_dir
+	$SUDO cp $cname_list $dnsmasq_dir
+
+	# Overwrite local database tables
+	$SUDO sqlite3 $gravity_db "DROP TABLE adlist;"
+	$SUDO sqlite3 $gravity_db -header -csv ".import adlist.csv adlist"
+	$SUDO sqlite3 $gravity_db "DROP TABLE domainlist;"
+	$SUDO sqlite3 $gravity_db -header -csv ".import domainlist.csv domainlist"
+
+	# Restart Pi-hole to pick up changes
+	$SUDO pihole -g
+
+	# Display success messages
+	echo "Local Pi-hole initialized in Pull mode and first pull successfully completed.";
+	echo "Future pulls can now be perfomed with 'pihole-cloudsync --pull'.";
+}
+push () {
+	 # Go to Pi-hole directory, exit if doesn't exist
+	cd $pihole_dir || exit
+
+        # Copy local Custom and CNAME lists to local Git repo
+        $SUDO cp $custom_list $personal_git_dir
+        $SUDO cp $dnsmasq_dir/$cname_list $personal_git_dir
+
+	# Go to local Git repo directory
+        cd $personal_git_dir || exit
+
+        # Export Ad and Domain lists from Gravity database
+        $SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM adlist" >$ad_list
+        $SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM domainlist" >$domain_list
+
+	# Compare local files to remote Git repo
+	$SUDO git remote update > /dev/null
+
+	# If local files are different than remote, update remote Git repo
+        CHANGED=$($SUDO git --work-tree=$personal_git_dir status --porcelain)
+        if [ -n "${CHANGED}" ]; then
+                echo 'Local Pi-hole lists are different than remote Git repo. Updating remote repo...';
+		rightnow=$(date +"%B %e, %Y %l:%M%p")
+		# Remove -q option if you don't want to run in "quiet" mode
+		$SUDO git commit -a -m "Updated $rightnow" -q
+		$SUDO git push -q
+		echo 'Done!';
+		exit 0
+        else
+	# If local files are the same as remote, do nothing and exit
+	echo 'Remote Git repo matches local Pi-hole lists. No further action required.';
+		exit 0
+        fi
+}
+pull () {
+        # Go to Pi-hole directory, exit if doesn't exist
+	cd $personal_git_dir || exit
+
+	# Update local Git repo from remote Git repo
+	$SUDO git remote update > /dev/null
+	CHANGED=$($SUDO git log HEAD..origin/master --oneline)
+	if [ -n "${CHANGED}" ]; then
+                echo 'Remote Git repo is different than local Pi-hole lists. Updating local lists...';
+                # Remove -q option if you don't want to run in "quiet" mode
+                $SUDO git fetch --all -q
+		$SUDO git reset --hard origin/master -q
+                $SUDO service pihole-FTL stop
+                $SUDO cp $custom_list $pihole_dir
+                $SUDO cp $cname_list $dnsmasq_dir
+                $SUDO sqlite3 $gravity_db "DROP TABLE adlist;"
+                $SUDO sqlite3 $gravity_db -header -csv ".import adlist.csv adlist"
+                $SUDO sqlite3 $gravity_db "DROP TABLE domainlist;"
+                $SUDO sqlite3 $gravity_db -header -csv ".import domainlist.csv domainlist"
+		$SUDO pihole -g
+                echo 'Done!';
+                exit 0
+        else
+                echo 'Local Pi-hole lists match remote Git repo. No further action required.';
+                exit 0
+        fi
+}
+###########################################################################
+# Check to see whether a command line option was provided
+if [ -z "$1" ]
+  then
+    echo "Missing command line option. Try --push, --pull, or --help."
+    exit 1
+fi
+# Determine which action to perform (InitPush, InitPull, Push, Pull, or Help)
+for arg in "$@"
+do
+    # Initialize - adds primary Pi-hole's lists to local Git repo before first push/upload
+    if [ "$arg" == "--initpush" ]
+    then
+	echo "$arg option detected. Initializing local Git repo for Push/Upload.";
+	push_initialize
+	exit 0
+    # Initialize - adds primary Pi-hole's lists to local Git repo before first push/upload
+    elif [ "$arg" == "--initpull" ]
+    then
+	echo "$arg option detected. Initializing local Git repo for Pull/Download.";
+	pull_initialize
+	exit 0
+    # Push / Upload - Pushes updated local Pi-hole lists to remote Git repo
+    elif [ "$arg" == "--push" ] || [ "$arg" == "--upload" ] || [ "$arg" == "--up" ] || [ "$arg" == "-u" ]
+    then
+	echo "$arg option detected. Running in Push/Upload mode."
+	push
+	exit 0
+    # Pull / Download - Pulls updated Pi-hole lists from remote Git repo
+    elif [ "$arg" == "--pull" ] || [ "$arg" == "--download" ] || [ "$arg" == "--down" ]|| [ "$arg" == "-d" ]
+    then
+        echo "$arg option detected. Running in Pull/Download mode."
+	pull
+        exit 0
+    # Help - Displays help dialog
+    elif [ "$arg" == "--help" ] || [ "$arg" == "-h" ] || [ "$arg" == "-?" ]
+    then
+	cat << EOF
+Usage: pihole-cloudsync <option>
+Options:
+  --push, --upload, --up, -u		Push (upload) your Pi-hole lists to a remote Git repo
+  --pull, --download, --down, -d	Pull (download) your lists from a remote Git repo
+  --initpush				Initialize Primary Pi-hole in "Push" mode
+  --initpull				Initialize Secondary Pi-hole in "Pull" mode
+  --help, -h, -?			Show this help dialog
+  --version, -v				Show the current version of pihole-cloudsync
+Examples:
+  'pihole-cloudsync --push' will push (upload) your lists to a Git repo
+  'pihole-cloudsync --pull' will pull (download) your lists from a Git repo
+Project Home: https://github.com/stevejenkins/pihole-cloudsync
+EOF
+
+    # Version - Displays version number
+    elif [ "$arg" == "--version" ] || [ "$arg" == "-v" ]
+	then
+	echo 'pihole-cloudsync v'$version' - Updated '"$update";
+	echo 'https://github.com/stevejenkins/pihole-cloudsync';
+
+    # Invalid command line option was passed
+    else
+	echo "Invalid command line option. Try --push, --pull, or --help."
+	exit 1
+    fi
+done
