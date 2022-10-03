@@ -1,4 +1,4 @@
-# `pihole-cloudsync` (script and documenttion by <a target="_blank" href="https://github.com/stevejenkins/">Steve Jenkins</a>)
+# `pihole-cloudsync` (script and documentation by <a target="_blank" href="https://github.com/stevejenkins/">Steve Jenkins</a>)
 A script to help synchronize <a target="_blank" 
 href="https://pi-hole.net/">Pi-hole</a> adlist/blocklist, blacklist, whitelist, regex, custom DNS hostnames, and custom CNAME hostnames across multiple Pi-holes using a Git repository.
 
