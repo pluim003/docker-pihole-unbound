@@ -7,8 +7,8 @@
 # Steve Jenkins (stevejenkins.com)
 # https://github.com/stevejenkins/pihole-cloudsync
 
-version='5.0'
-update='December 26, 2020'
+version='6.0'
+update='October 6, 2022'
 
 # SETUP
 # Follow the instructions in the README to set up your own private Git
@@ -37,8 +37,11 @@ pihole_dir='/etc/pihole'
 gravity_db='/etc/pihole/gravity.db'
 dnsmasq_dir='/etc/dnsmasq.d/'
 ad_list='adlist.csv'
+ad_by_group_list='adlist_by_group.csv'
 custom_list='custom.list'
 domain_list='domainlist.csv'
+domain_by_group_list='domainlist_by_group.csv'
+
 cname_list='05-pihole-custom-cname.conf'
 ###########################################################################
 # SHOULDN'T NEED TO EDIT BELOW THIS LINE
@@ -67,7 +70,9 @@ push_initialize () {
 
 	# Export Ad and Domain lists from Gravity database
 	$SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM adlist" >$ad_list
-	$SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM domainlist" >$domain_list
+        $SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM adlist_by_group" >$ad_by_group_list
+        $SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM domainlist" >$domain_list
+        $SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM domainlist_by_group" >$domain_by_group_list
 
 	# Add all lists to local Git repo
 	$SUDO git add .
@@ -93,12 +98,19 @@ pull_initialize () {
 
 	# Overwrite local database tables
 	$SUDO sqlite3 $gravity_db "DROP TABLE adlist;"
-	$SUDO sqlite3 $gravity_db -header -csv ".import adlist.csv adlist"
+	$SUDO sqlite3 $gravity_db -header -csv ".import adlist.csv adlist -v"
+        $SUDO sqlite3 $gravity_db "DROP TABLE adlist_by_group;"
+        $SUDO sqlite3 $gravity_db -header -csv ".import adlist_by_group.csv adlist_by_group -v"
 	$SUDO sqlite3 $gravity_db "DROP TABLE domainlist;"
-	$SUDO sqlite3 $gravity_db -header -csv ".import domainlist.csv domainlist"
+	$SUDO sqlite3 $gravity_db -header -csv ".import domainlist.csv domainlist -v"
+        $SUDO sqlite3 $gravity_db "DROP TABLE domainlist_by_group;"
+        $SUDO sqlite3 $gravity_db -header -csv ".import domainlist_by_group.csv domainlist_by_group -v"
 
 	# Restart Pi-hole to pick up changes
 	$SUDO pihole -g
+
+	# Run another time due to foreign key mismatch-errors
+	#$SUDO pihole -g
 
 	# Display success messages
 	echo "Local Pi-hole initialized in Pull mode and first pull successfully completed.";
@@ -118,6 +130,8 @@ push () {
         # Export Ad and Domain lists from Gravity database
         $SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM adlist" >$ad_list
         $SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM domainlist" >$domain_list
+        $SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM adlist_by_group" >$ad_by_group_list
+	$SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM domainlist_by_group" >$domain_by_group_list
 
 	# Compare local files to remote Git repo
 	$SUDO git remote update > /dev/null
@@ -154,9 +168,13 @@ pull () {
                 $SUDO cp $custom_list $pihole_dir
                 $SUDO cp $cname_list $dnsmasq_dir
                 $SUDO sqlite3 $gravity_db "DROP TABLE adlist;"
-                $SUDO sqlite3 $gravity_db -header -csv ".import adlist.csv adlist"
+                $SUDO sqlite3 $gravity_db -header -csv ".import adlist.csv adlist -v"
                 $SUDO sqlite3 $gravity_db "DROP TABLE domainlist;"
-                $SUDO sqlite3 $gravity_db -header -csv ".import domainlist.csv domainlist"
+                $SUDO sqlite3 $gravity_db -header -csv ".import domainlist.csv domainlist -v"
+	        $SUDO sqlite3 $gravity_db "DROP TABLE adlist_by_group;"
+	        $SUDO sqlite3 $gravity_db -header -csv ".import adlist_by_group.csv adlist_by_group -v"
+	        $SUDO sqlite3 $gravity_db "DROP TABLE domainlist_by_group;"
+	        $SUDO sqlite3 $gravity_db -header -csv ".import domainlist_by_group.csv domainlist_by_group -v"
 		$SUDO pihole -g
                 echo 'Done!';
                 exit 0
@@ -204,6 +222,7 @@ do
     then
 	cat << EOF
 Usage: pihole-cloudsync <option>
+
 Options:
   --push, --upload, --up, -u		Push (upload) your Pi-hole lists to a remote Git repo
   --pull, --download, --down, -d	Pull (download) your lists from a remote Git repo
@@ -211,9 +230,11 @@ Options:
   --initpull				Initialize Secondary Pi-hole in "Pull" mode
   --help, -h, -?			Show this help dialog
   --version, -v				Show the current version of pihole-cloudsync
+
 Examples:
   'pihole-cloudsync --push' will push (upload) your lists to a Git repo
   'pihole-cloudsync --pull' will pull (download) your lists from a Git repo
+
 Project Home: https://github.com/stevejenkins/pihole-cloudsync
 EOF
 
