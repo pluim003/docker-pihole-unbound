@@ -1,21 +1,30 @@
 ARG PIHOLE_VERSION
-FROM pihole/pihole:nightly
+FROM pihole/pihole:dev
 
-COPY sources.list /etc/apt/sources.list
+# Default versions
+ENV UNBOUND_VERSION=1.16.3
 
-RUN apt update && apt install -y -f unbound*
 
-RUN mkdir -p /var/log/unbound
-RUN chown -R unbound:unbound /var/log/unbound
+RUN apt update && apt install -y build-essential && apt install wget
+RUN apt install -y libssl-dev && apt install -y libexpat1-dev
+RUN apt-get install -y bison && apt-get install -y flex
+
+# Install Unbound
+
+RUN wget https://nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz \
+    && tar -xf unbound-${UNBOUND_VERSION}.tar.gz -C / && rm unbound-${UNBOUND_VERSION}.tar.gz
+
+RUN cd unbound-${UNBOUND_VERSION} && ./configure && make && make install \
+    && cd / && rm -rf unbound-${UNBOUND_VERSION}
+
 COPY lighttpd-external.conf /etc/lighttpd/external.conf 
 COPY unbound-pihole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
 COPY 99-edns.conf /etc/dnsmasq.d/99-edns.conf
 RUN mkdir -p /etc/services.d/unbound
 COPY unbound-run /etc/services.d/unbound/run
+RUN chmod ug+x /etc/services.d/unbound/run
 
-COPY unbound-package-helper /usr/lib/unbound/package-helper
-RUN chmod 755 /usr/lib/unbound/package-helper
-
+RUN useradd unbound && mkdir /var/lib/unbound
 RUN wget https://www.internic.net/domain/named.root -qO- | tee /var/lib/unbound/root.hints
 RUN chown -R unbound:unbound /var/lib/unbound/root.hints
 
