@@ -1,0 +1,34 @@
+ARG PIHOLE_VERSION
+FROM pihole/pihole:nightly
+
+COPY sources.list /etc/apt/sources.list
+
+RUN apt update && apt install -y -f unbound* && apt install -y -f wget 
+
+RUN mkdir -p /var/log/unbound
+RUN chown -R unbound:unbound /var/log/unbound
+COPY lighttpd-external.conf /etc/lighttpd/external.conf 
+COPY unbound-pihole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
+COPY 99-edns.conf /etc/dnsmasq.d/99-edns.conf
+RUN mkdir -p /etc/services.d/unbound
+COPY unbound-run /etc/services.d/unbound/run
+
+COPY unbound-package-helper /usr/lib/unbound/package-helper
+RUN chmod 755 /usr/lib/unbound/package-helper
+
+RUN wget https://www.internic.net/domain/named.root -qO- | tee /var/lib/unbound/root.hints
+RUN chown -R unbound:unbound /var/lib/unbound/root.hints
+
+# install pihole-cloudsync (from repository by Steve Jenkins)
+
+RUN mkdir -p /usr/local/bin/pihole-cloudsync
+COPY pihole-cloudsync/pihole-cloudsync /usr/local/bin/pihole-cloudsync
+RUN chmod +x /usr/local/bin/pihole-cloudsync/pihole-cloudsync
+
+# we need ssh to use git to logon without asking for credentials and not to store credentials 
+# on a persistent volume
+
+RUN apt install -y -f openssh-server
+
+ENTRYPOINT ./s6-init
+
