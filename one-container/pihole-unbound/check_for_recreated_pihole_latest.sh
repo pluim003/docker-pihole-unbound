@@ -1,7 +1,6 @@
 #!/bin/bash
 
 BASEDIR=$(dirname $0)
-#date >>check_for_recreated_pihole_latest.log
 date
 
 pihole_latest_image=pihole/pihole:latest
@@ -18,10 +17,13 @@ echo Pihole-unbound-latest ${created_pihole_unbound_latest}
 
 if [[ "${created_pihole_latest}" > "${created_pihole_unbound_latest}" ]];
 then echo "There is a new Pihole-latest, recreating the Pihole-Unbound-latest" 
-	   sh $BASEDIR/build_and_push_latest.sh
+           pihole_docker_tag="$(docker inspect ${pihole_latest_image}  | grep PIHOLE_DOCKER_TAG)"
+	   pihole_docker_tag=$(pihole_docker_tag::-2)
+	   pihole_docker_tag=`echo ${pihole_docker_tag}  | awk '{print substr($0, 20)}'`
+	   echo ${pihole_docker_tag}
+	   sh $BASEDIR/build_and_push_latest.sh $(pihole_docker_tag) 
 fi
 
-#date >>check_for_recreated_pihole_latest.log
 date
 
 exit $?
