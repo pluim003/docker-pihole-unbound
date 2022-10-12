@@ -18,7 +18,7 @@ echo Pihole-unbound-nightly ${created_pihole_unbound_nightly}
 
 if [[ "${created_pihole_nightly}" > "${created_pihole_unbound_nightly}" ]];
 then echo "There is a new Pihole-nightly, recreating the Pihole-Unbound-nightly" 
-	   sh $BASEDIR/build_and_push_arm_nightly.sh
+	   sh $BASEDIR/build_and_push_nightly.sh
 fi
 
 #date >>check_for_recreated_pihole_nightly.log
