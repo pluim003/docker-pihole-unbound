@@ -3,7 +3,8 @@ FROM pihole/pihole:nightly
 
 COPY sources.list /etc/apt/sources.list
 
-RUN apt update && apt install -y -f unbound* && apt install -y -f wget && apt install -y -f openssh-server
+RUN apt update && apt install -y -f unbound* && apt install -y -f net-tools \
+    && apt install -y -f wget && apt install -y -f openssh-server
 
 RUN mkdir -p /var/log/unbound
 RUN chown -R unbound:unbound /var/log/unbound
