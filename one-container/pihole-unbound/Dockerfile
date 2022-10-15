@@ -1,7 +1,7 @@
 ARG PIHOLE_VERSION
 FROM pihole/pihole:${PIHOLE_VERSION:-latest}
 
-COPY sources.list /etc/apt/sources.list
+COPY debian_unstable.list /etc/apt/sources.list.d/
 
 RUN apt update && apt install -y -f unbound* && apt install -y -f wget
 
