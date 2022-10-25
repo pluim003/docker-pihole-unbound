@@ -7,7 +7,7 @@ on:
   #    - 'dev'
   schedule:
   # cron job to trigger the build dialy (time in UTC)
-    - cron:  '30 * * * *'
+    - cron:  '* 4 * * *'
 
 
 jobs:
@@ -38,7 +38,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           build-args: PIHOLE_VERSION=${{ steps.pihole_version.outputs.release }}
-          ref: dev
           context: "{{defaultContext}}:one-container/pihole-unbound/"
           file: "Dockerfile_nightly"
           platforms: linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/amd64
