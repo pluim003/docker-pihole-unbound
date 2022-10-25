@@ -1,9 +1,10 @@
 ARG PIHOLE_VERSION
 FROM pihole/pihole:nightly
 
-COPY sources.list /etc/apt/sources.list
+COPY debian_unstable.list /etc/apt/sources.list.d/
 
-RUN apt update && apt install -y -f unbound* && apt install -y -f wget
+RUN apt update && apt install -y -f unbound* && apt install -y -f net-tools \
+    && apt install -y -f wget && apt install -y -f openssh-server
 
 RUN mkdir -p /var/log/unbound
 RUN chown -R unbound:unbound /var/log/unbound
@@ -18,6 +19,12 @@ RUN chmod 755 /usr/lib/unbound/package-helper
 
 RUN wget https://www.internic.net/domain/named.root -qO- | tee /var/lib/unbound/root.hints
 RUN chown -R unbound:unbound /var/lib/unbound/root.hints
+
+# install pihole-cloudsync (from repository by Steve Jenkins)
+
+RUN mkdir -p /usr/local/bin/pihole-cloudsync
+COPY pihole-cloudsync/pihole-cloudsync /usr/local/bin/pihole-cloudsync
+RUN chmod +x /usr/local/bin/pihole-cloudsync/pihole-cloudsync
 
 ENTRYPOINT ./s6-init
 
