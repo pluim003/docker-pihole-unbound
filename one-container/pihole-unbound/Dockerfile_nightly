@@ -27,5 +27,12 @@ RUN mkdir -p /usr/local/bin/pihole-cloudsync
 COPY pihole-cloudsync/pihole-cloudsync /usr/local/bin/pihole-cloudsync
 RUN chmod +x /usr/local/bin/pihole-cloudsync/pihole-cloudsync
 
+LABEL org.opencontainers.image.authors="Dick Pluim" \
+      org.opencontainers.image.title="***/pihole-unbound" \
+      org.opencontainers.image.description="Run Pi-Hole + Unbound on Docker" \
+      org.opencontainers.image.url="https://github.com/***/docker-pihole-unbound" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.source="https://github.com/***/docker-pihole-unbound"
+
 ENTRYPOINT ./s6-init
 
