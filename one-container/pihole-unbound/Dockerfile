@@ -14,6 +14,9 @@ RUN mkdir -p /etc/services.d/unbound
 COPY unbound-run /etc/services.d/unbound/run
 COPY unbound-logrotate /etc/logrotate.d/unbound
 
+COPY unbound-logrotate /etc/logrotate.d/unbound
+RUN chmod 644 /etc/logrotate.d/unbound
+
 COPY unbound-package-helper /usr/lib/unbound/package-helper
 RUN chmod 755 /usr/lib/unbound/package-helper
 
