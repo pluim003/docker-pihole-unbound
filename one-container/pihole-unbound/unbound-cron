@@ -1,3 +1,4 @@
 # cronfile for use with Unbound
 #
-@reboot root /usr/sbin/logrotate --state /var/lib/logrotate/unbound /etc/unbound/logrotate
+# logrotate at midnight
+0 0 * * *  root /usr/sbin/logrotate --state /var/lib/logrotate/unbound /etc/unbound/logrotate
