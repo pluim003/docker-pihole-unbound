@@ -1,4 +1,4 @@
-name: Build and push nightly
+name: Build and push nightly Pihole-Unbound-image
 
 on:
   # cron job to trigger the build on any push to dev
@@ -34,7 +34,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
       -
-        name: Build and push nightly
+        name: Build and push nightly image
         uses: docker/build-push-action@v3
         with:
           build-args: PIHOLE_VERSION=${{ steps.pihole_version.outputs.release }}
