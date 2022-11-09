@@ -16,7 +16,7 @@ RUN mkdir -p /etc/services.d/unbound
 COPY unbound-run /etc/services.d/unbound/run
 
 COPY unbound-logrotate /etc/unbound/logrotate
-RUN chmod 644 /etc/logrotate.d/unbound
+RUN chmod 644 /etc/unbound/logrotate
 
 COPY unbound-cron /etc/cron.d/unbound
 RUN chmod 644 /etc/cron.d/unbound
