@@ -3,9 +3,7 @@ FROM pihole/pihole:nightly
 
 COPY debian_testing.list /etc/apt/sources.list.d/
 
-RUN apt update && apt install -y -f openssl \ 
-    && apt install -y -f unbound* && apt install -y -f net-tools \
-    && apt install -y -f wget && apt install -y -f openssh-server
+RUN apt update && apt install -y -f openssl net-tools unbound openssh-server
 
 RUN mkdir -p /var/log/unbound
 RUN chown -R unbound:unbound /var/log/unbound
@@ -24,7 +22,7 @@ RUN chmod 644 /etc/cron.d/unbound
 COPY unbound-package-helper /usr/lib/unbound/package-helper
 RUN chmod 755 /usr/lib/unbound/package-helper
 
-RUN wget https://www.internic.net/domain/named.root -qO- | tee /var/lib/unbound/root.hints
+RUN curl https://www.internic.net/domain/named.root -o /var/lib/unbound/root.hints
 RUN chown -R unbound:unbound /var/lib/unbound/root.hints
 
 # install pihole-cloudsync (from repository by Steve Jenkins)
