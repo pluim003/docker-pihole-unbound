@@ -9,7 +9,7 @@ on:
       - 'VERSION'
 #  schedule:
   # cron job to trigger the build dialy (time in UTC)
-#    - cron:  '* 0 * * *'
+#    - cron:  '0 4 * * *'
 
 jobs:
   docker:
