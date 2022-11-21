@@ -16,11 +16,22 @@ COPY unbound-run /etc/services.d/unbound/run
 COPY unbound-logrotate /etc/unbound/logrotate
 RUN chmod 644 /etc/unbound/logrotate
 
+COPY unbound-cron /etc/cron.d/unbound
+RUN chmod 644 /etc/cron.d/unbound
+
 COPY unbound-package-helper /usr/lib/unbound/package-helper
 RUN chmod 755 /usr/lib/unbound/package-helper
 
 RUN curl https://www.internic.net/domain/named.root -o /var/lib/unbound/root.hints
 RUN chown -R unbound:unbound /var/lib/unbound/root.hints
+
+LABEL org.opencontainers.image.authors="Dick Pluim" \
+      org.opencontainers.image.title="pluim003/pihole-unbound" \
+      org.opencontainers.image.description="Run Pi-Hole + Unbound on Docker" \
+      org.opencontainers.image.url="https://github.com/pluim003/docker-pihole-unbound" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.source="https://github.com/pluim003/docker-pihole-unbound" \
+      org.opencontainers.image.original_source="https://github.com/cbcrowe/docker-pihole-unbound"
 
 ENTRYPOINT ./s6-init
 
