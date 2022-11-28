@@ -1,0 +1,3 @@
+[submodule "one-container/pihole-unbound/pihole_adlist_tool"]
+	path = one-container/pihole-unbound/pihole_adlist_tool
+	url = https://github.com/yubiuser/pihole_adlist_tool

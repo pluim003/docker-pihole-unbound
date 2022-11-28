@@ -25,6 +25,12 @@ RUN chmod 755 /usr/lib/unbound/package-helper
 RUN curl https://www.internic.net/domain/named.root -o /var/lib/unbound/root.hints
 RUN chown -R unbound:unbound /var/lib/unbound/root.hints
 
+# install pihole_adlist_tool (from repository by yubiuser)
+
+RUN git clone https://github.com/yubiuser/pihole_adlist_tool.git
+COPY pihole_adlist_tool/pihole_adlist_tool /usr/local/bin
+RUN chmod +x /usr/local/bin/pihole_adlist_tool
+
 LABEL org.opencontainers.image.authors="Dick Pluim" \
       org.opencontainers.image.title="pluim003/pihole-unbound" \
       org.opencontainers.image.description="Run Pi-Hole + Unbound on Docker" \
