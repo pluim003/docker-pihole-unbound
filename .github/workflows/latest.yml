@@ -1,7 +1,7 @@
 name: Build and push latest
 
 on:
-  # cron job to trigger the build on any push to dev
+  # cron job to trigger the build on any push to master
   push:
     branches:
       - 'main'
