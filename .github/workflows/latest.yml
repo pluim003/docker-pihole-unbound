@@ -5,8 +5,8 @@ on:
   push:
     branches:
       - 'main'
-#    paths:
- #     - 'VERSION'
+    paths:
+      - 'VERSION'
 #  schedule:
   # cron job to trigger the build dialy (time in UTC)
 #    - cron:  '0 4 * * *'
