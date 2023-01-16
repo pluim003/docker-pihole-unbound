@@ -1,5 +1,5 @@
 ARG PIHOLE_VERSION
-FROM pihole/pihole:nightly
+FROM pihole/pihole:v6-pre-alpha
 
 COPY debian_testing.list /etc/apt/sources.list.d/
 
@@ -18,12 +18,6 @@ RUN chmod 644 /etc/unbound/logrotate
 
 COPY unbound-cron /etc/cron.d/unbound
 RUN chmod 644 /etc/cron.d/unbound
-
-COPY lighttpd-logrotate /etc/lighttpd/logrotate
-RUN chmod 644 /etc/lighttpd/logrotate
-
-COPY lighttpd-cron /etc/cron.d/www-data
-RUN chmod 644 /etc/cron.d/www-data
 
 COPY unbound-package-helper /usr/lib/unbound/package-helper
 RUN chmod 755 /usr/lib/unbound/package-helper
@@ -51,4 +45,3 @@ LABEL org.opencontainers.image.authors="Dick Pluim" \
       org.opencontainers.image.original_source="https://github.com/cbcrowe/docker-pihole-unbound"
 
 ENTRYPOINT ./s6-init
-
