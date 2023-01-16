@@ -1,0 +1,20 @@
+/var/log/lighttpd/pihole-access.log {
+        daily
+        rotate 7
+        compress
+        delaycompress
+        missingok
+        notifempty
+        create 644
+}
+
+/var/log/lighttpd/pihole-error.log {
+        daily
+        rotate 7
+        compress
+        delaycompress
+        missingok
+        notifempty
+        create 644
+}
+
