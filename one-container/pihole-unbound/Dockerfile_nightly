@@ -19,6 +19,12 @@ RUN chmod 644 /etc/unbound/logrotate
 COPY unbound-cron /etc/cron.d/unbound
 RUN chmod 644 /etc/cron.d/unbound
 
+COPY lighttpd-logrotate /etc/lighttpd/logrotate
+RUN chmod 644 /etc/lighttpd/logrotate
+
+COPY lighttpd-cron /etc/cron.d/www-data
+RUN chmod 644 /etc/cron.d/www-data
+
 COPY unbound-package-helper /usr/lib/unbound/package-helper
 RUN chmod 755 /usr/lib/unbound/package-helper
 
