@@ -2,11 +2,11 @@ name: Build and push latest
 
 on:
   # cron job to trigger the build on any push to master
-  push:
-    branches:
+#  push:
+#    branches:
       - 'main'
-    paths:
-      - 'one-container/pihole-unbound/VERSION'
+ #   paths:
+ #     - 'one-container/pihole-unbound/VERSION'
 #  schedule:
   # cron job to trigger the build dialy (time in UTC)
 #    - cron:  '0 4 * * *'
