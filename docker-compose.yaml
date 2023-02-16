@@ -4,7 +4,6 @@ volumes:
   etc_pihole:
   etc_dnsmasq:
   etc_unbound:
-#  resolv.conf:
 
 services:
   pihole:
@@ -13,17 +12,15 @@ services:
     hostname: ${HOSTNAME}
     domainname: ${DOMAIN_NAME}
     ports:
-      - ${WEB_PORT}:${WEB_PORT}/tcp
+      - ${WEB_PORT}:80/tcp
       - 53:53/tcp
       - 53:53/udp
-      # - 80:80/tcp
       # - 5335:5335/tcp # Uncomment to enable unbound access on local server
       # - 22/tcp # Uncomment to enable SSH
     environment:
       FTLCONF_LOCAL_IPV4: ${FTLCONF_LOCAL_IPV4}
       TZ: ${TZ}
       WEBPASSWORD: ${WEBPASSWORD}
-      WEB_PORT: ${WEB_PORT}
       REV_SERVER: ${REV_SERVER}
       REV_SERVER_TARGET: ${REV_SERVER_TARGET}
       REV_SERVER_DOMAIN: ${REV_SERVER_DOMAIN}
@@ -31,7 +28,6 @@ services:
       PIHOLE_DNS_: 127.0.0.1#5335 # Hardcoded to our Unbound server
       DNSSEC: "true" # Enable DNSSEC
       DNSMASQ_LISTENING: single
-#      DNS1: ${DNS1}
     volumes:
       - etc_pihole:/etc/pihole:rw
       - etc_dnsmasq:/etc/dnsmasq.d:rw
