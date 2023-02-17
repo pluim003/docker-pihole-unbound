@@ -6,7 +6,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'one-container/pihole-unbound/VERSION'
+      - 'pihole-unbound/VERSION'
 #  schedule:
   # cron job to trigger the build dialy (time in UTC)
 #    - cron:  '0 4 * * *'
@@ -39,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           build-args: PIHOLE_VERSION=${{ steps.pihole_version.outputs.release }}
-          context: "{{defaultContext}}:one-container/pihole-unbound/"
+          context: "{{defaultContext}}:pihole-unbound/"
           platforms: linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/amd64
           push: true
           tags: pluim003/pihole-unbound:latest,pluim003/pihole-unbound:${{ steps.pihole_version.outputs.release }}
