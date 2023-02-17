@@ -1,0 +1,13 @@
+/var/log/lighttpd/*-pihole.log {
+        daily
+        rotate 7
+        compress
+        delaycompress
+        missingok
+        notifempty
+        create 644
+        sharedscripts
+        postrotate
+         /etc/init.d/lighttpd reload
+        endscript
+}
