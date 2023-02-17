@@ -1,4 +1,4 @@
-/var/log/lighttpd/pihole-access.log {
+/var/log/lighttpd/*-pihole.log {
         daily
         rotate 7
         compress
@@ -6,15 +6,8 @@
         missingok
         notifempty
         create 644
+        sharedscripts
+        postrotate
+         /etc/init.d/lighttpd reload
+        endscript
 }
-
-/var/log/lighttpd/pihole-error.log {
-        daily
-        rotate 7
-        compress
-        delaycompress
-        missingok
-        notifempty
-        create 644
-}
-
