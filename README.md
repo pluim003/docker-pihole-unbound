@@ -45,17 +45,7 @@ WEBTHEME=default-light
 
 ### Using Portainer stacks? 
 
-#### Note: the text belows was written by Chris Crowe. I have no experience with this. I only use the docker-compose up-method
-
-> 2022-3-11: I'm being told that the advice below is no longer true in Portainer. If you're using Portainer, first try it without removing the volumes declaration and see if it works.
-
-Portainer stacks are a little weird and don't want you to declare your named volumes, so remove this block from the top of the `docker-compose.yaml` file before copy/pasting into Portainer's stack editor:
-
-```yaml
-volumes:
-  etc_pihole-unbound:
-  etc_pihole_dnsmasq-unbound:
-```
+When using Portainer to deploy the stack might fail if you have a mapping to /etc/resolv.conf in your docker-compose.yaml-file. Removing the mapping will succeed, but you will end up with the default resolv.conf.
 
 ### Running the stack
 
