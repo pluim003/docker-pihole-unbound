@@ -32,5 +32,5 @@ services:
       - etc_pihole:/etc/pihole:rw
       - etc_dnsmasq:/etc/dnsmasq.d:rw
       - etc_unbound:/etc/unbound:rw
-      - ./resolv.conf:/etc/resolv.conf
+#      - ./resolv.conf:/etc/resolv.conf
     restart: unless-stopped
