@@ -29,8 +29,7 @@ First create a `.env` file to substitute variables for your deployment.
 Example `.env` file in the same directory as your `docker-compose.yaml` file:
 
 ```
-FTLCONF_LOCAL_IPV4=192.168.1.10
-TZ=America/Los_Angeles
+TZ=Europe/Amsterdam
 WEBPASSWORD=QWERTY123456asdfASDF
 WEB_PORT=8100
 FTLCONF_LOCAL_IPV4=192.168.1.35
@@ -41,6 +40,7 @@ REV_SERVER_CIDR=192.168.0.0/16
 HOSTNAME=pihole
 DOMAIN_NAME=pihole.local
 WEBTHEME=default-light
+DNSSEC=true
 ```
 
 ### Using Portainer stacks? 
