@@ -14,23 +14,35 @@ First create a `.env` file to substitute variables for your deployment.
 
 > Vars and descriptions replicated from the [official pihole container](https://github.com/pi-hole/docker-pi-hole/#environment-variables):
 
+### Recommended variables
+
 | Variable | Default | Value | Description |
 | -------- | ------- | ----- | ---------- |
 | `TZ` | UTC | `<Timezone>` | Set your [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) to make sure logs rotate at local midnight instead of at UTC midnight.
 | `WEBPASSWORD` | random | `<Admin password>` | http://pi.hole/admin password. Run `docker logs pihole \| grep random` to find your random pass.
-| `WEB_PORT` | unset | `<PORT>`| **This will break the 'webpage blocked' functionality of Pi-hole** however it may help advanced setups like those running synology or `--net=host` docker argument.  This guide explains how to restore webpage blocked functionality using a linux router DNAT rule: [Alternative Synology installation method](https://discourse.pi-hole.net/t/alternative-synology-installation-method/5454?u=diginc)
 | `FTLCONF_LOCAL_IPV4` | unset | `<Host's IP>` | Set to your server's LAN IP, used by web block modes and lighttpd bind address.
+
+### Optional variables
+
+| Variable | Default | Value | Description |
+| -------- | ------- | ----- | ---------- |
+| `DNSSEC` | 	false  |	`<"true"\|"false">` | Enable DNSSEC support
 | `REV_SERVER` | `false` | `<"true"\|"false">` | Enable DNS conditional forwarding for device name resolution |
 | `REV_SERVER_DOMAIN` | unset | Network Domain | If conditional forwarding is enabled, set the domain of the local network router |
 | `REV_SERVER_TARGET` | unset | Router's IP | If conditional forwarding is enabled, set the IP of the local network router |
 | `REV_SERVER_CIDR` | unset | Reverse DNS | If conditional forwarding is enabled, set the reverse DNS zone (e.g. `192.168.0.0/24`) |
 | `WEBTHEME` | `default-light` | `<"default-dark"\|"default-darker"\|"default-light"\|"default-auto"\|"lcars">`| User interface theme to use.
 
+### Advanced variables
+
+| Variable | Default | Value | Description |
+| -------- | ------- | ----- | ---------- |
+| `WEB_PORT` | unset | `<PORT>`| **This will break the 'webpage blocked' functionality of Pi-hole** however it may help advanced setups like those running synology or `--net=host` docker argument.  This guide explains how to restore webpage blocked functionality using a linux router DNAT rule: [Alternative Synology installation method](https://discourse.pi-hole.net/t/alternative-synology-installation-method/5454?u=diginc)
+
 Example `.env` file in the same directory as your `docker-compose.yaml` file:
 
 ```
-FTLCONF_LOCAL_IPV4=192.168.1.10
-TZ=America/Los_Angeles
+TZ=Europe/Amsterdam
 WEBPASSWORD=QWERTY123456asdfASDF
 WEB_PORT=8100
 FTLCONF_LOCAL_IPV4=192.168.1.35
@@ -41,21 +53,12 @@ REV_SERVER_CIDR=192.168.0.0/16
 HOSTNAME=pihole
 DOMAIN_NAME=pihole.local
 WEBTHEME=default-light
+DNSSEC=true
 ```
 
 ### Using Portainer stacks? 
 
-#### Note: the text belows was written by Chris Crowe. I have no experience with this. I only use the docker-compose up-method
-
-> 2022-3-11: I'm being told that the advice below is no longer true in Portainer. If you're using Portainer, first try it without removing the volumes declaration and see if it works.
-
-Portainer stacks are a little weird and don't want you to declare your named volumes, so remove this block from the top of the `docker-compose.yaml` file before copy/pasting into Portainer's stack editor:
-
-```yaml
-volumes:
-  etc_pihole-unbound:
-  etc_pihole_dnsmasq-unbound:
-```
+When using Portainer to deploy the stack might fail if you have a mapping to /etc/resolv.conf in your docker-compose.yaml-file. Removing the mapping will succeed, but you will end up with the default resolv.conf.
 
 ### Running the stack
 
