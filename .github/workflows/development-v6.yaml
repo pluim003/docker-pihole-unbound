@@ -2,7 +2,7 @@ name: Build and push development v6 Pihole-Unbound-image
 
 on:
   # cron job to trigger the build on any push to dev
-  workflow_dispatch
+  workflow_dispatch:
   push:
     branches:
       - 'main'
