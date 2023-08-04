@@ -1,5 +1,5 @@
 ARG PIHOLE_VERSION
-FROM pihole/pihole:v6-pre-alpha
+FROM pihole/pihole:development-v6
 
 COPY debian_testing.list /etc/apt/sources.list.d/
 
