@@ -9,7 +9,7 @@ on:
       - 'Dockerfile_v6'
   schedule:
   # cron job to trigger the build dialy (time in UTC)
-    - cron:  '0 8 * * *'
+  #  - cron:  '0 8 * * *'
 
 
 jobs:
