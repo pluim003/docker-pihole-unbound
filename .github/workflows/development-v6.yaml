@@ -3,8 +3,8 @@ name: Build and push development v6 Pihole-Unbound-image
 on:
   # cron job to trigger the build on any push to dev
   push:
-    # branches:
-    #  - 'dev'
+    branches:
+      - 'main'
     paths:
       - 'Dockerfile_v6'
   schedule:
