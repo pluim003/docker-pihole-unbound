@@ -44,4 +44,4 @@ jobs:
           file: "Dockerfile_v6"
           platforms: linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/amd64,linux/386
           push: true
-          tags: pluim003/pihole-unbound:v6-pre-alpha
+          tags: pluim003/pihole-unbound:development-v6
