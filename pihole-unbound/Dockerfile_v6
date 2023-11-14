@@ -44,8 +44,8 @@ RUN chmod +x /usr/local/bin/pihole_adlist_tool
 
 RUN apk add openrc
 RUN rc-update add unbound default
-RUN touch /run/openrc/softlevel
 RUN unbound-anchor -a /var/lib/unbound/root.key
+# RUN touch /run/openrc/softlevel
 RUN rc-service unbound start
 
 LABEL org.opencontainers.image.authors="Dick Pluim" \
