@@ -40,6 +40,14 @@ RUN git clone https://github.com/yubiuser/pihole_adlist_tool.git
 COPY pihole_adlist_tool/pihole_adlist_tool /usr/local/bin
 RUN chmod +x /usr/local/bin/pihole_adlist_tool
 
+# rc-stuff
+
+RUN apk add openrc
+RUN openrc-update add unbound default
+RUN touch /run/openrc/softlevel
+RUN unbound-anchor -a /var/lib/unbound/root.key
+RUN openrc-service unbound start
+
 LABEL org.opencontainers.image.authors="Dick Pluim" \
       org.opencontainers.image.title="pluim003/pihole-unbound" \
       org.opencontainers.image.description="Run Pi-Hole + Unbound on Docker" \
