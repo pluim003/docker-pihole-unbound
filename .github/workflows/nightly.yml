@@ -3,9 +3,9 @@ name: Build and push nightly Pihole-Unbound-image
 on:
   # cron job to trigger the build on any push to dev
   #push:
-  #  branches:
+  branches:
   #  - paths: 'Dockerfile_nightly'
-  #    - 'dev'
+      - 'main'
   schedule:
   # cron job to trigger the build dialy (time in UTC)
     - cron:  '0 4 * * *'
