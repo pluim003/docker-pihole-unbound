@@ -9,8 +9,8 @@ FROM pihole/pihole:development-v6
 
 RUN apk add unbound
 
-RUN mkdir -p /var/log/unbound
-RUN chown -R unbound:unbound /var/log/unbound
+RUN mkdir -p /var/log/unbound && mkdir -p /var/lib/unbound
+RUN chown -R unbound:unbound /var/log/unbound && chown -R unbound:unbound /var/lib/unbound
 # COPY lighttpd-external.conf /etc/lighttpd/external.conf 
 COPY unbound-pihole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
 # COPY 99-edns.conf /etc/dnsmasq.d/99-edns.conf
