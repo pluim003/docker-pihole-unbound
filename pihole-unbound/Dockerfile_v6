@@ -7,16 +7,16 @@ FROM pihole/pihole:development-v6
 
 # RUN apt update && apt install -y -f openssl net-tools unbound openssh-server
 
-RUN apk add unbound --no-cache
-
 RUN mkdir -p /var/log/unbound && mkdir -p /var/lib/unbound
 RUN chown -R unbound:unbound /var/log/unbound && chown -R unbound:unbound /var/lib/unbound
+
+RUN apk add unbound --no-cache
 
 # rc-stuff
 
 RUN apk add openrc --no-cache
 RUN rc-update add unbound default
-RUN unbound-anchor -a /var/lib/unbound/root.key
+RUN /usr/sbin/unbound-anchor -a /var/lib/unbound/root.key
 # RUN touch /run/openrc/softlevel
 
 # COPY lighttpd-external.conf /etc/lighttpd/external.conf 
