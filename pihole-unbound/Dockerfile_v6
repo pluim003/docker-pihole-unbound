@@ -7,10 +7,18 @@ FROM pihole/pihole:development-v6
 
 # RUN apt update && apt install -y -f openssl net-tools unbound openssh-server
 
-RUN apk add unbound
+RUN apk add unbound --no-cache
 
 RUN mkdir -p /var/log/unbound && mkdir -p /var/lib/unbound
 RUN chown -R unbound:unbound /var/log/unbound && chown -R unbound:unbound /var/lib/unbound
+
+# rc-stuff
+
+RUN apk add openrc --no-cache
+RUN rc-update add unbound default
+RUN unbound-anchor -a /var/lib/unbound/root.key
+# RUN touch /run/openrc/softlevel
+
 # COPY lighttpd-external.conf /etc/lighttpd/external.conf 
 COPY unbound-pihole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
 # COPY 99-edns.conf /etc/dnsmasq.d/99-edns.conf
@@ -40,14 +48,6 @@ RUN git clone https://github.com/yubiuser/pihole_adlist_tool.git
 COPY pihole_adlist_tool/pihole_adlist_tool /usr/local/bin
 RUN chmod +x /usr/local/bin/pihole_adlist_tool
 
-# rc-stuff
-
-RUN apk add openrc
-RUN rc-update add unbound default
-# RUN unbound-anchor -a /var/lib/unbound/root.key
-# RUN touch /run/openrc/softlevel
-RUN rc-service unbound start
-
 LABEL org.opencontainers.image.authors="Dick Pluim" \
       org.opencontainers.image.title="pluim003/pihole-unbound" \
       org.opencontainers.image.description="Run Pi-Hole + Unbound on Docker" \
@@ -56,6 +56,7 @@ LABEL org.opencontainers.image.authors="Dick Pluim" \
       org.opencontainers.image.source="https://github.com/pluim003/docker-pihole-unbound" \
       org.opencontainers.image.original_source="https://github.com/cbcrowe/docker-pihole-unbound"
 
+RUN rc-service unbound start
 ENTRYPOINT ["/sbin/tini", "--", "start.sh"]
 
 # ENTRYPOINT ./s6-init
