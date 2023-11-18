@@ -59,8 +59,8 @@ LABEL org.opencontainers.image.authors="Dick Pluim" \
       org.opencontainers.image.source="https://github.com/pluim003/docker-pihole-unbound" \
       org.opencontainers.image.original_source="https://github.com/cbcrowe/docker-pihole-unbound"
 
-ENTRYPOINT ["/sbin/tini", "--", "start.sh"]
+# ENTRYPOINT ["/sbin/tini", "--", "start.sh"]
 
-# ENTRYPOINT ["/usr/sbin/start_all.sh"]
+ENTRYPOINT ["/usr/sbin/start_all.sh"]
 
 # ENTRYPOINT ./s6-init
