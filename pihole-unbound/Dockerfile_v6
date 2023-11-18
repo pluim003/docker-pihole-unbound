@@ -49,6 +49,7 @@ COPY pihole_adlist_tool/pihole_adlist_tool /usr/local/bin
 RUN chmod +x /usr/local/bin/pihole_adlist_tool
 
 COPY start_all.sh /usr/sbin
+RUN chmod +x /usr/sbin/start_all.sh
 
 LABEL org.opencontainers.image.authors="Dick Pluim" \
       org.opencontainers.image.title="pluim003/pihole-unbound" \
