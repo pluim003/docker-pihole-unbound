@@ -61,6 +61,6 @@ LABEL org.opencontainers.image.authors="Dick Pluim" \
 
 # ENTRYPOINT ["/sbin/tini", "--", "start.sh"]
 
-ENTRYPOINT ["/usr/sbin/start_all.sh"]
+ENTRYPOINT ["/sbin/tini", "--", "start_all.sh"]
 
 # ENTRYPOINT ./s6-init
