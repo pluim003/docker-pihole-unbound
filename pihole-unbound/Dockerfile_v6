@@ -16,7 +16,7 @@ RUN chown -R unbound:unbound /var/log/unbound && chown -R unbound:unbound /var/l
 
 # rc-stuff
 
-RUN apk add openrc --no-cache
+RUN apk add rsyslog openrc --no-cache
 RUN mkdir -p /run/openrc
 RUN touch /run/openrc/softlevel
 
