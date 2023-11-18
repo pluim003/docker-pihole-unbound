@@ -2,8 +2,8 @@
 # service rsyslog start
 /usr/sbin/unbound-anchor -a /var/lib/unbound/root.key
 chown unbound:unbound /var/lib/unbound/root.key
-touch /run/openrc/softlevel
-rc-update add unbound default
+unbound 
+# touch /run/openrc/softlevel
+# rc-update add unbound default
 #rc-service unbound start
-unbound
 /usr/bin/start.sh
