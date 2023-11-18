@@ -17,7 +17,8 @@ RUN chown -R unbound:unbound /var/log/unbound && chown -R unbound:unbound /var/l
 # rc-stuff
 
 RUN apk add openrc --no-cache
-# RUN touch /run/openrc/softlevel
+RUN mkdir -p /run/openrc
+RUN touch /run/openrc/softlevel
 
 # COPY lighttpd-external.conf /etc/lighttpd/external.conf 
 COPY unbound-pihole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
