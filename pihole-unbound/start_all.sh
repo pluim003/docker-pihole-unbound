@@ -1,4 +1,4 @@
-#/bin/sh
+#/bin/bash -e
 /usr/sbin/unbound-anchor -a /var/lib/unbound/root.key
 rc_service start unbound
-/usr/sbin/start.sh
+/usr/bin/start.sh
