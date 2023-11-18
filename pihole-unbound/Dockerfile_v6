@@ -17,8 +17,6 @@ RUN chown -R unbound:unbound /var/log/unbound && chown -R unbound:unbound /var/l
 # rc-stuff
 
 RUN apk add openrc
-RUN rc-update add unbound default
-RUN /usr/sbin/unbound-anchor -a /var/lib/unbound/root.key
 # RUN touch /run/openrc/softlevel
 
 # COPY lighttpd-external.conf /etc/lighttpd/external.conf 
