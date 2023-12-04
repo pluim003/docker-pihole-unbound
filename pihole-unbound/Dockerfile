@@ -13,6 +13,8 @@ COPY 99-edns.conf /etc/dnsmasq.d/99-edns.conf
 RUN mkdir -p /etc/services.d/unbound
 COPY unbound-run /etc/services.d/unbound/run
 
+COPY unbound.conf /etc/unbound/unbound.conf
+RUN chmod 644 /etc/unbound/unbound.conf
 COPY unbound-logrotate /etc/unbound/logrotate
 RUN chmod 644 /etc/unbound/logrotate
 
