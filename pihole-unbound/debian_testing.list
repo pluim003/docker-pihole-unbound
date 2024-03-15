@@ -1,2 +1,2 @@
- # use unstable to get latest version of unbound
+ # use testing to get latest version of unbound
  deb http://deb.debian.org/debian testing main
