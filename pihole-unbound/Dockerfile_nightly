@@ -1,7 +1,7 @@
 ARG PIHOLE_VERSION
 FROM pihole/pihole:nightly
 
-COPY debian_unstable.list /etc/apt/sources.list.d/
+COPY debian_testing.list /etc/apt/sources.list.d/
 COPY preferences /etc/apt/
 
 # run update and install software
