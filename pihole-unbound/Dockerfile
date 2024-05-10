@@ -1,10 +1,11 @@
 ARG PIHOLE_VERSION
 FROM pihole/pihole:${PIHOLE_VERSION:-latest}
 
+RUN apt install -y -f git
+
 COPY debian_testing.list /etc/apt/sources.list.d/
 
 RUN apt update && apt install -y -f unbound 
-RUN apt install -y -f git
 
 RUN mkdir -p /var/log/unbound
 RUN chown -R unbound:unbound /var/log/unbound
