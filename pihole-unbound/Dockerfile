@@ -1,5 +1,5 @@
 ARG PIHOLE_VERSION
-FROM pihole/pihole:2024.05.0
+FROM pihole/pihole:latest
 
 # install pihole_adlist_tool (from repository by yubiuser)
 
@@ -9,7 +9,7 @@ RUN chmod +x /usr/local/bin/pihole_adlist_tool
 
 COPY debian_testing.list /etc/apt/sources.list.d/
 
-RUN apt update && apt install -y -f unbound 
+# RUN apt update && apt install -y -f unbound 
 
 RUN mkdir -p /var/log/unbound
 RUN chown -R unbound:unbound /var/log/unbound
