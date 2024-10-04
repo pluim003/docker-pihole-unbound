@@ -7,9 +7,10 @@ RUN git clone https://github.com/yubiuser/pihole_adlist_tool.git
 COPY pihole_adlist_tool/pihole_adlist_tool /usr/local/bin
 RUN chmod +x /usr/local/bin/pihole_adlist_tool
 
-COPY debian_testing.list /etc/apt/sources.list.d/
+COPY debian_bookworm.list /etc/apt/sources.list.d/
 
-# RUN apt update && apt install -y -f unbound 
+RUN apt-get update && apt-get install -y -f unbound 
+#RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -yq install unbound --no-install-recommends
 
 RUN mkdir -p /var/log/unbound
 RUN chown -R unbound:unbound /var/log/unbound
