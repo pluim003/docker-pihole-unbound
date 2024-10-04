@@ -1,5 +1,5 @@
 ARG PIHOLE_VERSION
-FROM pihole/pihole:${PIHOLE_VERSION}
+FROM pihole/pihole:2024.05.0
 
 # install pihole_adlist_tool (from repository by yubiuser)
 
