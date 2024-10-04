@@ -6,7 +6,7 @@ COPY preferences /etc/apt/
 
 # install git
 
-RUN apt-get update && apt-get install -y -f git
+RUN sudo apt-get update && sudo apt-get install -y -f git
 
 # install pihole_adlist_tool (from repository by yubiuser)
 
