@@ -56,6 +56,12 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
       -
+        name: Install Unbound
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: unbound
+          version: 
+      -
         name: Build and push latest
         uses: docker/build-push-action@v3
         with:
