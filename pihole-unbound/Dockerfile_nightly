@@ -18,29 +18,31 @@ RUN chmod +x /usr/local/bin/pihole_adlist_tool
 
 RUN apt update 
 RUN apt install -y -f openssl wget
-#RUN apt install -y -f net-tools 
-#RUN apt install -y -f unbound 
-# RUN apt install -y -f openssh-server
-
-# create unbound-user
-
-RUN mkdir -p /var/log/unbound
-RUN mkdir -p /var/lib/unbound
-RUN groupadd --gid 102 unbound
-RUN adduser --uid 101 unbound --ingroup unbound --disabled-login
-RUN chown -R unbound:unbound /var/log/unbound
-
-RUN wget https://nlnetlabs.nl/downloads/unbound/unbound-latest.tar.gz
-RUN tar xzf unbound-latest.tar.gz
-
-RUN apt update
 RUN apt install -y build-essential
-
 RUN apt install -y libssl-dev
 RUN apt install -y libexpat1-dev
 
 RUN apt-get install -y bison
 RUN apt-get install -y flex
+
+#RUN apt install -y -f net-tools 
+# RUN apt install -y -f openssh-server
+
+# create unbound-user
+
+RUN groupadd --gid 102 unbound
+RUN adduser --uid 101 unbound --ingroup unbound --disabled-login
+
+# add some directories
+
+RUN mkdir -p /var/log/unbound
+RUN mkdir -p /var/lib/unbound
+RUN chown -R unbound:unbound /var/log/unbound
+
+# get latest unbound and compile it
+
+RUN wget https://nlnetlabs.nl/downloads/unbound/unbound-latest.tar.gz
+RUN tar xzf unbound-latest.tar.gz
 
 RUN ls -l && \
  cd unbound-1.21.1 && \
@@ -49,10 +51,8 @@ RUN ls -l && \
  make && \
  sudo make install
 
-RUN mkdir -p /var/log/unbound
-RUN mkdir -p /var/lib/unbound
-RUN adduser unbound --disabled-login
-RUN chown -R unbound:unbound /var/log/unbound
+# copy some files
+
 COPY lighttpd-external.conf /etc/lighttpd/external.conf 
 COPY unbound-pihole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
 COPY 99-edns.conf /etc/dnsmasq.d/99-edns.conf
