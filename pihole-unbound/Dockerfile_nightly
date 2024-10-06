@@ -32,8 +32,8 @@ RUN apk add openssl wget
 
 # create unbound-user
 
-RUN groupadd --gid 102 unbound
-RUN adduser --uid 101 unbound --ingroup unbound --disabled-login
+# RUN groupadd --gid 102 unbound
+RUN adduser --uid 101 unbound
 
 # add some directories
 
