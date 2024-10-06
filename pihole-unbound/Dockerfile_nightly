@@ -1,5 +1,5 @@
 ARG PIHOLE_VERSION
-FROM pihole/pihole:nightly
+FROM pihole/pihole:latest
 
 # COPY debian_bookworm.list /etc/apt/sources.list.d/
 # COPY preferences /etc/apt/
