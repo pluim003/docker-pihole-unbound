@@ -21,11 +21,11 @@ RUN chmod +x /usr/local/bin/pihole_adlist_tool
 # RUN apk update 
 RUN apk add openssl wget
 # RUN apk add build-essential
-RUN apk add libssl-dev
-RUN apk add libexpat1-dev
+# RUN apk add libssl-dev
+# RUN apk add libexpat1-dev
 
-RUN apk install bison
-RUN apk install flex
+# RUN apk install bison
+# RUN apk install flex
 
 # RUN apk install -y -f net-tools 
 # RUN apk install -y -f openssh-server
