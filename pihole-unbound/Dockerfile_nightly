@@ -51,6 +51,8 @@ RUN ls -l && \
  make && \
  sudo make install
 
+RUN cp /usr/local/sbin/* /usr/sbin/
+
 # copy some files
 
 COPY lighttpd-external.conf /etc/lighttpd/external.conf 
