@@ -7,6 +7,7 @@ ENV UNBOUND_VERSION=1.21.1
 
 # install git
 
+RUN apk update
 RUN apk add --update git
 
 # install pihole_adlist_tool (from repository by yubiuser)
@@ -19,12 +20,12 @@ RUN chmod +x /usr/local/bin/pihole_adlist_tool
 
 # RUN apk update 
 RUN apk add openssl wget
-RUN apk add build-essential
-RUN apk install -y libssl-dev
-RUN apk install -y libexpat1-dev
+# RUN apk add build-essential
+RUN apk add libssl-dev
+RUN apk add libexpat1-dev
 
-RUN apk install -y bison
-RUN apk install -y flex
+RUN apk install bison
+RUN apk install flex
 
 # RUN apk install -y -f net-tools 
 # RUN apk install -y -f openssh-server
