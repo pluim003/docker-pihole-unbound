@@ -43,6 +43,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: "pi-hole/docker-pi-hole"
           type: "latest"
+      - name: Get tag name from date
+        id: tag_date
+        run: echo "TAG_DATE=$(date +'%Y%m%d')" >>$GITHUB_ENV
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -69,4 +72,4 @@ jobs:
           context: "{{defaultContext}}:pihole-unbound/"
           platforms: linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/amd64
           push: true
-          tags: pluim003/pihole-unbound:latest,pluim003/pihole-unbound:${{ steps.pihole_version.outputs.release }}
+          tags: pluim003/pihole-unbound:latest,pluim003/pihole-unbound:${{ steps.pihole_version.outputs.release }}_${{ env.TAG_DATE })
