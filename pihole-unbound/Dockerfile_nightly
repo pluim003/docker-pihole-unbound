@@ -1,8 +1,12 @@
 ARG PIHOLE_VERSION
 FROM pihole/pihole:latest
 
-COPY debian_bookworm.list /etc/apt/sources.list.d/
-COPY preferences /etc/apt/
+# COPY debian_bookworm.list /etc/apt/sources.list.d/
+# COPY preferences /etc/apt/
+
+# default versions
+
+ENV UNBOUND_VERSION=1.21.1
 
 # install git
 
@@ -25,7 +29,7 @@ RUN apt install -y libexpat1-dev
 RUN apt-get install -y bison
 RUN apt-get install -y flex
 
-#RUN apt install -y -f net-tools 
+# RUN apt install -y -f net-tools 
 # RUN apt install -y -f openssh-server
 
 # create unbound-user
@@ -45,7 +49,7 @@ RUN wget https://nlnetlabs.nl/downloads/unbound/unbound-latest.tar.gz
 RUN tar xzf unbound-latest.tar.gz
 
 RUN ls -l && \
- cd unbound-1.21.1 && \
+ cd unbound-${UNBOUND_VERSION} && \
  ls -l && \
  ./configure && \
  make && \
@@ -61,7 +65,11 @@ COPY 99-edns.conf /etc/dnsmasq.d/99-edns.conf
 RUN mkdir -p /etc/services.d/unbound
 COPY unbound-run /etc/services.d/unbound/run
 
-COPY unbound.conf_1.21 /usr/local/etc/unbound/unbound.conf
+# to be on the safe side 2 times a copy of unbound.conf
+
+COPY unbound.conf /var/lib/unbound/unbound.conf
+RUN chmod 644 /var/lib//unbound/unbound.conf
+COPY unbound.conf /usr/local/etc/unbound/unbound.conf
 RUN chmod 644 /usr/local/etc/unbound/unbound.conf
 COPY unbound-logrotate /etc/unbound/logrotate
 RUN chmod 644 /etc/unbound/logrotate
