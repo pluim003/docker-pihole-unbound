@@ -69,8 +69,9 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           build-args: PIHOLE_VERSION=${{ steps.pihole_version.outputs.release }}
+                      UNBOUND_TAG=${{secrets.UNBOUND_VERSION}}
           context: "{{defaultContext}}:pihole-unbound/"
           platforms: linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/amd64
           push: true
        #   tags: pluim003/pihole-unbound:latest,pluim003/pihole-unbound:${{ steps.pihole_version.outputs.release }}_${{ env.TAG_DATE }}
-          tags: pluim003/pihole-unbound:latest,pluim003/pihole-unbound:${{ steps.pihole_version.outputs.release }}_${{$UNBOUND_VERSION}}
+          tags: pluim003/pihole-unbound:latest,pluim003/pihole-unbound:${{ steps.pihole_version.outputs.release }}_${{$UNBOUND_TAG}}
