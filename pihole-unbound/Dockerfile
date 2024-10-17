@@ -3,7 +3,7 @@ FROM pihole/pihole:latest
 
 # default versions
 
-ENV UNBOUND_VERSION=1.21.1
+ENV UNBOUND_VERSION=1.22.0
 
 # install git
 
