@@ -1,47 +1,13 @@
-# development-v6-image
-
 ARG PIHOLE_VERSION
-FROM pihole/pihole:development-v6
+FROM pihole/pihole:latest
 
-# COPY debian_testing.list /etc/apt/sources.list.d/
+# default versions
 
-# RUN apt update && apt install -y -f openssl net-tools unbound openssh-server
+ENV UNBOUND_VERSION=1.22.0
 
-RUN apk add unbound --no-cache
+# install git
 
-# directories made later as chown won't work before apk add unbound
-
-RUN mkdir -p /var/log/unbound && mkdir -p /var/lib/unbound
-RUN chown -R unbound:unbound /var/log/unbound && chown -R unbound:unbound /var/lib/unbound
-
-# rc-stuff
-
-RUN apk add rsyslog openrc --no-cache
-RUN mkdir -p /run/openrc
-RUN touch /run/openrc/softlevel
-
-# COPY lighttpd-external.conf /etc/lighttpd/external.conf 
-COPY unbound-pihole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
-# COPY 99-edns.conf /etc/dnsmasq.d/99-edns.conf
-RUN mkdir -p /etc/services.d/unbound
-COPY unbound-run /etc/services.d/unbound/run
-
-# COPY unbound-logrotate /etc/unbound/logrotate
-# RUN chmod 644 /etc/unbound/logrotate
-
-# COPY unbound-cron /etc/cron.d/unbound
-# RUN chmod 644 /etc/cron.d/unbound
-
-# COPY unbound-package-helper /usr/lib/unbound/package-helper
-# RUN chmod 755 /usr/lib/unbound/package-helper
-
-RUN curl https://www.internic.net/domain/named.root -o /var/lib/unbound/root.hints
-RUN chown -R unbound:unbound /var/lib/unbound/root.hints
-
-# install pihole-cloudsync (from repository by Steve Jenkins)
-
-COPY pihole-cloudsync/pihole-cloudsync /usr/local/bin
-RUN chmod +x /usr/local/bin/pihole-cloudsync
+RUN apt-get update && apt-get install -y -f git
 
 # install pihole_adlist_tool (from repository by yubiuser)
 
@@ -49,8 +15,73 @@ RUN git clone https://github.com/yubiuser/pihole_adlist_tool.git
 COPY pihole_adlist_tool/pihole_adlist_tool /usr/local/bin
 RUN chmod +x /usr/local/bin/pihole_adlist_tool
 
-COPY start_all.sh /usr/sbin
-RUN chmod +x /usr/sbin/start_all.sh
+# run update and install software
+
+RUN apt update && \
+ apt install -y -f openssl wget build-essential libssl-dev libexpat-dev bison flex
+
+# create unbound-user
+
+RUN groupadd --gid 102 unbound
+RUN adduser --uid 101 unbound --ingroup unbound --disabled-login
+
+# add some directories
+
+RUN mkdir -p /var/log/unbound
+RUN mkdir -p /var/lib/unbound
+RUN chown -R unbound:unbound /var/log/unbound
+
+# get latest unbound and compile it
+
+RUN wget https://nlnetlabs.nl/downloads/unbound/unbound-latest.tar.gz
+RUN tar xzf unbound-latest.tar.gz
+
+RUN ls -l && \
+ cd unbound-${UNBOUND_VERSION} && \
+ ls -l && \
+ ./configure && \
+ make && \
+ sudo make install
+
+RUN cp /usr/local/sbin/* /usr/sbin/
+
+# copy some files
+
+COPY lighttpd-external.conf /etc/lighttpd/external.conf 
+COPY unbound-pihole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
+COPY 99-edns.conf /etc/dnsmasq.d/99-edns.conf
+RUN mkdir -p /etc/services.d/unbound
+COPY unbound-run /etc/services.d/unbound/run
+
+# to be on the safe side 2 times a copy of unbound.conf
+
+COPY unbound.conf /var/lib/unbound/unbound.conf
+RUN chmod 644 /var/lib//unbound/unbound.conf
+COPY unbound.conf /usr/local/etc/unbound/unbound.conf
+RUN chmod 644 /usr/local/etc/unbound/unbound.conf
+COPY unbound-logrotate /etc/unbound/logrotate
+RUN chmod 644 /etc/unbound/logrotate
+
+COPY unbound-cron /etc/cron.d/unbound
+RUN chmod 644 /etc/cron.d/unbound
+
+COPY lighttpd-logrotate /etc/lighttpd/logrotate
+RUN chmod 644 /etc/lighttpd/logrotate
+
+COPY lighttpd-cron /etc/cron.d/www-data
+RUN chmod 644 /etc/cron.d/www-data
+
+COPY unbound-package-helper /usr/lib/unbound/package-helper
+RUN chmod 755 /usr/lib/unbound/package-helper
+
+RUN curl https://www.internic.net/domain/named.root -o /var/lib/unbound/root.hints
+RUN cp /usr/share/dns/root.key /var/lib/unbound/
+RUN chown -R unbound:unbound /var/lib/unbound
+
+# install pihole-cloudsync (from repository by Steve Jenkins)
+
+COPY pihole-cloudsync/pihole-cloudsync /usr/local/bin
+RUN chmod +x /usr/local/bin/pihole-cloudsync
 
 LABEL org.opencontainers.image.authors="Dick Pluim" \
       org.opencontainers.image.title="pluim003/pihole-unbound" \
@@ -60,8 +91,4 @@ LABEL org.opencontainers.image.authors="Dick Pluim" \
       org.opencontainers.image.source="https://github.com/pluim003/docker-pihole-unbound" \
       org.opencontainers.image.original_source="https://github.com/cbcrowe/docker-pihole-unbound"
 
-# ENTRYPOINT ["/sbin/tini", "--", "start.sh"]
-
-ENTRYPOINT ["/sbin/tini", "--", "start_all.sh"]
-
-# ENTRYPOINT ./s6-init
+ENTRYPOINT ./s6-init
