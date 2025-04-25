@@ -1,5 +1,5 @@
 ARG PIHOLE_VERSION
-FROM pihole/pihole:latest
+FROM pihole/pihole:2024.07.0
 
 # default versions
 
