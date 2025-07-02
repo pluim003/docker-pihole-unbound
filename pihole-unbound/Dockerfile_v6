@@ -78,7 +78,7 @@ COPY unbound-package-helper /usr/lib/unbound/package-helper
 RUN chmod 755 /usr/lib/unbound/package-helper
 
 RUN curl https://www.internic.net/domain/named.root -o /var/lib/unbound/root.hints
-RUN cp /usr/share/dns/root.key /var/lib/unbound/
+# RUN cp /usr/share/dns/root.key /var/lib/unbound/
 RUN chown -R unbound:unbound /var/lib/unbound
 
 # install pihole-cloudsync (from repository by Steve Jenkins)
