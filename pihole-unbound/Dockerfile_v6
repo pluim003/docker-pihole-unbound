@@ -3,11 +3,11 @@ FROM pihole/pihole:latest
 
 # default versions
 
-ENV UNBOUND_VERSION=1.22.0
+ENV UNBOUND_VERSION=1.23.0
 
 # install git
 
-RUN apt-get update && apt-get install -y -f git
+RUN apk update && apk add git
 
 # install pihole_adlist_tool (from repository by yubiuser)
 
@@ -17,8 +17,8 @@ RUN chmod +x /usr/local/bin/pihole_adlist_tool
 
 # run update and install software
 
-RUN apt update && \
- apt install -y -f openssl wget build-essential libssl-dev libexpat-dev bison flex
+#RUN apk update && \
+# apk install -y -f openssl wget build-essential libssl-dev libexpat-dev bison flex
 
 # create unbound-user
 
@@ -33,15 +33,18 @@ RUN chown -R unbound:unbound /var/log/unbound
 
 # get latest unbound and compile it
 
-RUN wget https://nlnetlabs.nl/downloads/unbound/unbound-latest.tar.gz
-RUN tar xzf unbound-latest.tar.gz
+RUN apk update && apk add unbound
 
-RUN ls -l && \
- cd unbound-${UNBOUND_VERSION} && \
- ls -l && \
- ./configure && \
- make && \
- sudo make install
+#RUN wget https://nlnetlabs.nl/downloads/unbound/unbound-latest.tar.gz
+#RUN tar xzf unbound-latest.tar.gz
+
+#RUN ls -l && \
+# cd unbound-${UNBOUND_VERSION} && \
+# ls -l && \
+# ./configure && \
+# make && \
+# sudo make install
+
 
 RUN cp /usr/local/sbin/* /usr/sbin/
 
