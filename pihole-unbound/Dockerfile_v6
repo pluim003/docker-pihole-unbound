@@ -46,7 +46,7 @@ RUN apk update && apk add unbound
 # sudo make install
 
 
-RUN cp /usr/local/sbin/* /usr/sbin/
+# RUN cp /usr/local/sbin/* /usr/sbin/
 
 # copy some files
 
