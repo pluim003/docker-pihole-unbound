@@ -23,7 +23,7 @@ RUN chmod +x /usr/local/bin/pihole_adlist_tool
 # create unbound-user
 
 RUN addgroup --gid 102 unbound
-RUN adduser --uid 101 unbound --ingroup unbound --disabled-login
+RUN adduser --uid 101 unbound --ingroup unbound --disabled-password
 
 # add some directories
 
