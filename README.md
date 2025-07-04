@@ -9,7 +9,7 @@ The base image for the container is the [official Pi-Hole container](https://hub
 Note: October 6th, 2024. Adding more recent versions of unbound through apt doesn't work anymore on newer releases. The latest docker-image with tag 2024.07.0 contains the latest pihole-image 2024.07.0 with Unbouond v1.21.1. 
 The nightly docker-image is currently the same. The pihole nightly-image uses Alpine Linux and I can't get things working there. I might look into it later. Otherwise I'll create only new images when new versions of Unbound are being released and tag the images with name.<pihole_docker_tag>_<date> f.e. pluim003/pihole-unbound:2024.07.0_20241006. Or do something with the unbound-version as well in the tag.
 
-Note: July 4th, 2025. Finally managed to get a working container with the new Pi-Hole v6 and Unbound,l thanx to @mpgirro as his repository gave me some clue how to solve the issues I was having. As v6 is based on Alpine and I'm not familiar with that.
+Note: July 4th, 2025. Finally managed to get a working container with the new Pi-Hole v6 and Unbound,l thanx to https://github.com/mpgirro as his repository gave me some clue how to solve the issues I was having. As v6 is based on Alpine and I'm not familiar with that.
 ## Usage
 
 First create a `.env` file to substitute variables for your deployment.
