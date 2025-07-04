@@ -1,16 +1,13 @@
 ARG PIHOLE_VERSION
-FROM pihole/pihole:latest
-
-# COPY debian_bookworm.list /etc/apt/sources.list.d/
-# COPY preferences /etc/apt/
+FROM pihole/pihole:nightly
 
 # default versions
 
-ENV UNBOUND_VERSION=1.22.0
+ENV UNBOUND_VERSION=1.23.0
 
 # install git
 
-RUN apt-get update && apt-get install -y -f git
+RUN apk update && apk add git
 
 # install pihole_adlist_tool (from repository by yubiuser)
 
@@ -20,22 +17,13 @@ RUN chmod +x /usr/local/bin/pihole_adlist_tool
 
 # run update and install software
 
-RUN apt update 
-RUN apt install -y -f openssl wget
-RUN apt install -y build-essential
-RUN apt install -y libssl-dev
-RUN apt install -y libexpat1-dev
-
-RUN apt-get install -y bison
-RUN apt-get install -y flex
-
-# RUN apt install -y -f net-tools 
-# RUN apt install -y -f openssh-server
+#RUN apk update && \
+# apk install -y -f openssl wget build-essential libssl-dev libexpat-dev bison flex
 
 # create unbound-user
 
-RUN groupadd --gid 102 unbound
-RUN adduser --uid 101 unbound --ingroup unbound --disabled-login
+RUN addgroup --gid 102 unbound
+RUN adduser --uid 101 unbound --ingroup unbound --disabled-password
 
 # add some directories
 
@@ -45,17 +33,20 @@ RUN chown -R unbound:unbound /var/log/unbound
 
 # get latest unbound and compile it
 
-RUN wget https://nlnetlabs.nl/downloads/unbound/unbound-latest.tar.gz
-RUN tar xzf unbound-latest.tar.gz
+RUN apk update && apk add unbound
 
-RUN ls -l && \
- cd unbound-${UNBOUND_VERSION} && \
- ls -l && \
- ./configure && \
- make && \
- sudo make install
+#RUN wget https://nlnetlabs.nl/downloads/unbound/unbound-latest.tar.gz
+#RUN tar xzf unbound-latest.tar.gz
 
-RUN cp /usr/local/sbin/* /usr/sbin/
+#RUN ls -l && \
+# cd unbound-${UNBOUND_VERSION} && \
+# ls -l && \
+# ./configure && \
+# make && \
+# sudo make install
+
+
+# RUN cp /usr/local/sbin/* /usr/sbin/
 
 # copy some files
 
@@ -87,13 +78,17 @@ COPY unbound-package-helper /usr/lib/unbound/package-helper
 RUN chmod 755 /usr/lib/unbound/package-helper
 
 RUN curl https://www.internic.net/domain/named.root -o /var/lib/unbound/root.hints
-RUN cp /usr/share/dns/root.key /var/lib/unbound/
+# RUN cp /usr/share/dns/root.key /var/lib/unbound/
 RUN chown -R unbound:unbound /var/lib/unbound
 
 # install pihole-cloudsync (from repository by Steve Jenkins)
 
 COPY pihole-cloudsync/pihole-cloudsync /usr/local/bin
 RUN chmod +x /usr/local/bin/pihole-cloudsync
+
+COPY custom-entrypoint.sh /custom-entrypoint.sh
+RUN chmod +x /custom-entrypoint.sh
+
 
 LABEL org.opencontainers.image.authors="Dick Pluim" \
       org.opencontainers.image.title="pluim003/pihole-unbound" \
@@ -103,5 +98,5 @@ LABEL org.opencontainers.image.authors="Dick Pluim" \
       org.opencontainers.image.source="https://github.com/pluim003/docker-pihole-unbound" \
       org.opencontainers.image.original_source="https://github.com/cbcrowe/docker-pihole-unbound"
 
-ENTRYPOINT ./s6-init
-
+# ENTRYPOINT ./s6-init
+ENTRYPOINT ["/custom-entrypoint.sh"]
